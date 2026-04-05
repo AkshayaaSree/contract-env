@@ -1,0 +1,7 @@
+name: contract-review-env
+description: AI environment for legal contract analysis and risk detection
+
+tasks:
+  - clause_classification
+  - risk_detection
+  - contract_improvement
