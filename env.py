@@ -1,9 +1,13 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Dict, Any
 import random
 from tasks.tasks import tasks
 from graders.grader import grade
 
+
+# ---------------------------
+# MODELS
+# ---------------------------
 
 class Observation(BaseModel):
     contract_text: str
@@ -17,18 +21,26 @@ class Action(BaseModel):
     content: str
 
 
+class Reward(BaseModel):
+    value: float
+
+
+# ---------------------------
+# ENVIRONMENT
+# ---------------------------
+
 class ContractEnv:
     def __init__(self):
         self.tasks = tasks
 
-    def reset(self):
+    def reset(self) -> Observation:
         self.current_step = 0
         self.done = False
         self.history = []
 
         self.task = random.choice(self.tasks)
 
-        instruction_map = {
+        self.instructions_map = {
             "clause_classification": "Identify the clause type.",
             "risk_detection": "Identify risks and explain why.",
             "contract_improvement": "Suggest a safer version of the clause."
@@ -37,7 +49,7 @@ class ContractEnv:
         return Observation(
             contract_text=self.task["contract"],
             task_type=self.task["type"],
-            instructions=instruction_map[self.task["type"]],
+            instructions=self.instructions_map[self.task["type"]],
             previous_actions=[]
         )
 
@@ -47,9 +59,10 @@ class ContractEnv:
 
         self.current_step += 1
 
+        # Base grading
         base_score = grade(self.task, action.content)
 
-        # reward shaping
+        # Reward shaping
         reward = base_score * 0.7
 
         if len(action.content.split()) > 5:
@@ -61,10 +74,12 @@ class ContractEnv:
         if action.content in self.history:
             reward -= 0.1
 
+        # Success condition
         if base_score > 0.8:
             reward += 0.3
             self.done = True
 
+        # Max steps
         if self.current_step >= 5:
             self.done = True
 
@@ -73,23 +88,20 @@ class ContractEnv:
         observation = Observation(
             contract_text=self.task["contract"],
             task_type=self.task["type"],
-            instructions=self._get_instruction(),
+            instructions=self.instructions_map[self.task["type"]],
             previous_actions=self.history
         )
 
         return observation, round(reward, 2), self.done, {}
 
-    def _get_instruction(self):
+    def state(self) -> Dict[str, Any]:
+        """
+        Returns current environment state (OpenEnv requirement)
+        """
         return {
-            "clause_classification": "Identify the clause type.",
-            "risk_detection": "Identify risks and explain why.",
-            "contract_improvement": "Suggest a safer version."
-        }[self.task["type"]]
-
-    def state(self):
-        return {
-            "task": self.task,
+            "contract_text": self.task["contract"],
+            "task_type": self.task["type"],
+            "current_step": self.current_step,
             "history": self.history,
-            "step": self.current_step,
             "done": self.done
         }
