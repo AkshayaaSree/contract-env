@@ -1,5 +1,6 @@
 name: contract-review-env
 description: AI environment for legal contract analysis and risk detection
+entrypoint: server.py
 
 tasks:
   - clause_classification
