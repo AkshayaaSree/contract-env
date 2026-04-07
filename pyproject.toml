@@ -1,0 +1,18 @@
+[project]
+name = "contract-review-env"
+version = "0.1.0"
+description = "AI-powered contract review environment using OpenEnv"
+authors = [
+    { name = "R.Akshayaa Sree" }
+]
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "pydantic",
+    "openai",
+    "openenv-core"
+]
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
