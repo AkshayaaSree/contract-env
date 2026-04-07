@@ -1,29 +1,18 @@
-# Contract Review OpenEnv
+---
+title: contract-review-env
+emoji: ⚖️
+colorFrom: blue
+colorTo: green
+sdk: docker
+app_file: server.py
+pinned: false
+---
 
-## Overview
-This environment simulates real-world legal contract review workflows. Agents must classify clauses, detect risks, and propose safer alternatives.
+# Contract Review Environment
 
-## Tasks
-- Clause Classification (Easy)
-- Risk Detection (Medium)
-- Contract Improvement (Hard)
+This environment simulates real-world legal contract analysis tasks including:
+- Clause classification
+- Risk detection
+- Contract improvement
 
-## Action Space
-Agent provides textual analysis or suggestions.
-
-## Observation Space
-- Contract text
-- Task type
-- Instructions
-- Previous actions
-
-## Reward Design
-- Partial credit via keyword matching
-- Bonus for detailed reasoning
-- Penalties for vague or repeated answers
-- Completion bonus
-
-## Setup
-```bash
-pip install -r requirements.txt
-uvicorn server:app --host 0.0.0.0 --port 7860
+It follows the OpenEnv specification and evaluates agent performance using a reward-based system.
